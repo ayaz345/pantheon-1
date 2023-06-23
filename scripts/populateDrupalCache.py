@@ -36,12 +36,11 @@ def gather_urls(user_input):
     for sitemap in sitemaps:
         r = requests.get(sitemap, proxies=proxies)
         if r.status_code != 200:
-            print('Error, status code for ' + sitemap + ' was ' + r.status_code)
+            print(f'Error, status code for {sitemap} was {r.status_code}')
         else:
             xmldoc = minidom.parseString(r.content)
             itemlist = xmldoc.getElementsByTagName('loc')
-            for item in itemlist:
-                urls.append(item.firstChild.data)
+            urls.extend(item.firstChild.data for item in itemlist)
     return urls
 
 
@@ -51,7 +50,7 @@ def perform_requests(urls):
     for url in urls:
         try:
             rr = requests.get(url, proxies=proxies)
-            print(str(rr.status_code) + ': ' + url)
+            print(f'{rr.status_code}: {url}')
             success += 1
         except requests.exceptions.RequestException as e:
             print(e)
